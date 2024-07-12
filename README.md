@@ -23,3 +23,6 @@ installation of all libraries stated in `requirements.txt`
 # Setup
 
 It is recommended to use a virtual environment to avoid version conflict with other packages
+
+### Telegram bot
+[Perishervation Telegram bot](http://t.me/perishervation_bot)
