@@ -3,7 +3,7 @@ import dotenv
 from PIL import Image
 from io import BytesIO
 
-hardcode = dotenv.get_key(".env", "TOKEN")
+hardcode = dotenv.get_key(".env", "TELEGRAM_API")
 h2 = "800759626"
 # r = requests.get(f"https://api.telegram.org/bot{hardcode}/getUpdates")
 # print(r.json())
