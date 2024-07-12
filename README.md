@@ -26,3 +26,7 @@ It is recommended to use a virtual environment to avoid version conflict with ot
 
 ### Telegram bot
 [Perishervation Telegram bot](http://t.me/perishervation_bot)
+
+### Thingspeak Channel
+Id: `2597196`
+[Thingspeak Channel](https://thingspeak.com/channels/2597196)
