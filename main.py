@@ -11,6 +11,8 @@ API_DELAY = 15
 #     time.sleep(API_DELAY)
 
 while True:
-    print(sensors.read_temphumid())
+    for i in range(1,32):
+        print("Trying pin number: ", i)
+        print(sensors.read_temphumid(i))
     
-    time.sleep(API_DELAY)
+    #time.sleep(API_DELAY)
