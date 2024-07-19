@@ -16,8 +16,7 @@ A Python IoT Project to ensure the quality preservation of perishable goods duri
 - Temperature and humidity: DHT22
 
 # Requirements
-
-python>=3.11
+python>=3.11 
 installation of all libraries stated in `requirements.txt`
 
 # Setup
@@ -29,4 +28,5 @@ It is recommended to use a virtual environment to avoid version conflict with ot
 
 ### Thingspeak Channel
 Id: `2597196`
+
 [Thingspeak Channel](https://thingspeak.com/channels/2597196)

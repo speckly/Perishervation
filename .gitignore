@@ -1,2 +1,3 @@
 venv
 .en
+__pycache__
