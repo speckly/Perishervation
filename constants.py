@@ -10,5 +10,6 @@ LDR_GPIO = 9 # Light
 # Accelerometer
 ACCEL_SDA = 2
 ACCEL_SCL = 3
+BUZZER_GPIO = 18
 
 
