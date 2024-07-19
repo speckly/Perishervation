@@ -18,7 +18,7 @@ while True:
     print("Cycle number: ", cycle) # NOTE: Might want to remove this
     temperature, humidity = sensors.read_temphumid() # deg, %
     acceleration = None
-    light = None
+    light = sensors.read_light()
     
     #TODO: migrate this, this is temp
     if temperature is not None:
