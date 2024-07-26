@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 import spidev
 import Adafruit_DHT
-from constants import ACCEL_SCL, ACCEL_SDA, TEMPHUMID_GPIO, BUZZER_GPIO, LDR_SPI_CHANNEL
+from constants import TEMPHUMID_GPIO, BUZZER_GPIO, LDR_SPI_CHANNEL
 import adxl345
 from math import sqrt
 

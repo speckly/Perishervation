@@ -1,28 +1,37 @@
-import time
-import requests
-import random
+from time import sleep
 import sensors
 import thingspeak
+from constants import LIMITS, THINGSPEAK_API_DELAY
 
-API_DELAY = 15
+def check_limits(fields: list) -> None:
+    # [temperature, humidity, shock, light]
+    keys = ["temperature", "humidity", "acceleration", "light"]
+    for key, magnitude in zip(keys, fields):
+        field_limit = LIMITS.get(key)
+        if field_limit is None:
+            print("Your %s key is empty" % key)
+            continue
+        high_limit, low_limit = LIMITS[key].get("high"), LIMITS[key].get("low")
+        if not all([magnitude < high_limit if high_limit else True, magnitude > low_limit if low_limit else True]):
+            beeps, duration = LIMITS[key].get("beeps"), LIMITS[key].get("duration")
+            if not all([beeps, duration]):
+                print("Either beeps or duration is empty for %s, check it again" % key)
+                continue
+            sensors.buzzer(beeps=beeps, duration=duration)
+        
 cycle = 0
-
-# for t, h in zip(temp, humid):
-#     res = requests.get(f"https://api.thingspeak.com/update?api_key=3F387GR8DQHVRXGW&field1={t}&field2={h}")
-#     print(f"{time.asctime()} Response code {res.status_code} for t={t}, h={h}")
-#     time.sleep(API_DELAY)
-
 
 while True:
     cycle += 1 
     print("Cycle number: ", cycle) # NOTE: Might want to remove this
-    temperature, humidity = sensors.read_temphumid() # deg, %
-    acceleration = round(sensors.std_accel(sensors.read_accel()), 5)
-    light = sensors.read_light()
+    temperature, humidity = sensors.read_temphumid() # deg or fah?, %
+    acceleration = round(sensors.std_accel(sensors.read_accel()), 5) # 0 to 1
+    light = sensors.read_light() # 0 to 1023
+    field_list = [temperature, humidity, acceleration, light]
     
-    #thingspeak.post(temperature, humidity, acceleration, light)
+    #thingspeak.post(field_list) # uncomment when deploying
     
-    #TODO: migrate this, this is temp
+    #TODO: remove this when deploying
     if temperature is not None:
         print("tmp: ", temperature)
     if humidity is not None:
@@ -32,8 +41,6 @@ while True:
     if light is not None:
         print("light: ", light)
 
-    # TODO: Determine conditions for the buzzer to be sounded,
-    if acceleration > 0.5:
-        sensors.buzzer(beeps=2, duration=0.1)
+    check_limits(field_list)
     
-    time.sleep(3)
+    sleep(THINGSPEAK_API_DELAY)
