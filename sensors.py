@@ -4,6 +4,7 @@ import spidev
 import Adafruit_DHT
 from constants import ACCEL_SCL, ACCEL_SDA, TEMPHUMID_GPIO, BUZZER_GPIO, LDR_SPI_CHANNEL
 import adxl345
+from math import sqrt
 
 ADDRESS=0x53
 
@@ -23,22 +24,26 @@ GPIO.setup(BUZZER_GPIO,GPIO.OUT)
 spi = spidev.SpiDev()
 spi.open(0, 0)
 
-#accelerometer = adafruit_adxl34x.ADXL345(i2c)
 
+# NOTE: This might be useless
 def standardise(data: float, mn=0, mx=1023) -> float:
     if mn >= mx:
         raise ValueError("min must be less than max")
     return (data - mn) / (mx - mn)
 
+def std_accel(raw: tuple) -> float:
+    x, y, z = raw
+    return sqrt(x**2 + y**2 + z**2)
+
 def read_temphumid(gpio=None) -> tuple:
     return Adafruit_DHT.read_retry(DHT, TEMPHUMID_GPIO if gpio is None else gpio, 
         retries=5, delay_seconds=1)
 
-def buzzer() -> None:
+def buzzer(beeps: int, duration: float) -> None:
     try:
-        for i in range(3): # Number of beeps
+        for i in range(beeps): # Number of beeps
             for state in [GPIO.HIGH, GPIO.LOW]:
-                time.sleep(0.2)
+                time.sleep(duration)
                 GPIO.output(BUZZER_GPIO, state)
     except KeyboardInterrupt:
         GPIO.output(BUZZER_GPIO, GPIO.LOW)
