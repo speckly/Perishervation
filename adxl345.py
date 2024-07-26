@@ -2,9 +2,7 @@ import smbus
 import time
 import configparser
 import math
-
-
-CALIB_FILE = 'accel_calib.txt'
+from constants import CALIB_FILE
 
 class Regis(object):
 

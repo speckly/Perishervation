@@ -7,4 +7,3 @@ z_offset = 260
 x_gain = 257
 y_gain = 253
 z_gain = 251
-

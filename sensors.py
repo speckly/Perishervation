@@ -3,6 +3,17 @@ import time
 import spidev
 import Adafruit_DHT
 from constants import ACCEL_SCL, ACCEL_SDA, TEMPHUMID_GPIO, BUZZER_GPIO, LDR_SPI_CHANNEL
+import adxl345
+
+ADDRESS=0x53
+
+acc=adxl345.ADXL345(i2c_port=1,address=ADDRESS) #instantiate
+acc.load_calib_value() #load calib. values in accel_calib
+acc.set_data_rate(data_rate=adxl345.DataRate.R_100) #see datasheet
+acc.set_range(g_range=adxl345.Range.G_16,full_res=True) # ..
+acc.measure_start()
+
+#acc.calibrate()
 
 DHT = Adafruit_DHT.DHT11
 GPIO.setwarnings(False)
@@ -32,8 +43,8 @@ def buzzer() -> None:
     except KeyboardInterrupt:
         GPIO.output(BUZZER_GPIO, GPIO.LOW)
         
-def read_accel():
-    pass
+def read_accel() -> tuple:
+    return acc.get_3_axis_adjusted() # x, y, z
 
 def read_light() -> int:
     # Black magic taken from the MCP3008 datasheet

@@ -17,7 +17,7 @@ while True:
     cycle += 1 
     print("Cycle number: ", cycle) # NOTE: Might want to remove this
     temperature, humidity = sensors.read_temphumid() # deg, %
-    acceleration = None
+    acceleration = sensors.read_accel()
     light = sensors.read_light()
     
     #TODO: migrate this, this is temp
@@ -31,7 +31,6 @@ while True:
         print("light: ", light)
     
     thingspeak.post(temperature, humidity, acceleration, light)
-        
         
     
     #sensors.buzzer()

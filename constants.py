@@ -13,4 +13,6 @@ ACCEL_SDA = 2
 ACCEL_SCL = 3
 BUZZER_GPIO = 18
 
+CALIB_FILE = 'accel_calib.txt'
+
 
