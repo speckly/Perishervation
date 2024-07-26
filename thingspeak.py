@@ -14,8 +14,10 @@ def post(temperature: float = None, humidity: float = None, shock: float = None,
     
     # remember to process with standardisation
 	thingspeak_fields = [temperature, humidity, shock, light]
-	post_url = WRITE_BASE_URL
+	get_url = WRITE_BASE_URL
 	for i, value in enumerate(thingspeak_fields, start=1):
 		if value is not None:
-			post_url += "&field%s=%s" % (i, value)
-	print(post_url)
+			get_url += "&field%s=%s" % (i, value)
+	print(get_url)
+
+	
