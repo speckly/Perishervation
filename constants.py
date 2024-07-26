@@ -18,5 +18,7 @@ LIMITS = {
 	"humidity": {"high": 50, "beeps": 1, "duration": 0.1},
 	"acceleration": {"high": 0.5, "beeps": 3, "duration": 0.1},
 	"light": {"low": 300, "beeps": 2, "duration": 0.2}
-	}
+}
+
+TELEGRAM_SERVER_IP = "172.23.37.96"
 	

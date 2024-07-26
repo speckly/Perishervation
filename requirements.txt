@@ -1,8 +1,7 @@
 pillow
 python-telegram-bot
-RPi.GPIO
 python-dotenv
 requests
-#git+https://github.com/adafruit/Adafruit_CircuitPython_ADXL34x.git
+RPi.GPIO
 #git+https://github.com/adafruit/DHT-sensor-library.git
 

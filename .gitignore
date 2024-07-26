@@ -1,3 +1,5 @@
 venv
 .env
 __pycache__
+user_uid_map.json
+host_uid_map.json
