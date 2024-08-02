@@ -6,12 +6,21 @@ from telegram import Update
 from dotenv import load_dotenv
 import os
 import json
+from collections import defaultdict
+
+class UIDGenerator:
+    def __init__(self):
+        self.counter = defaultdict(int)
+    
+    def get_uid(self, key):
+        self.counter[key] += 1
+        return self.counter[key]
 
 load_dotenv()
 # Configuration
 PORT = 8080
 API_KEY = os.getenv("TELEGRAM_API")
-HOST_UID_MAP = {}  # {uid: ip_address}
+HOST_UID_MAP = {'free': 1, 'hosts': {}}  # {uid: ip_address}
 USER_UID_MAP = {}  # {telegram_id: uid}
 HOST_UID_FILE = 'host_uid_map.json'
 USER_UID_FILE = 'user_uid_map.json'
@@ -39,32 +48,39 @@ application = Application.builder().token(API_KEY).build()
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     if user_id not in USER_UID_MAP:
-        await update.message.reply_text("Please send the UID displayed on the LCD.")
+        await update.message.reply_text("Please send the UID displayed on https://perishervation.com/get_uid")
     else:
         uid = USER_UID_MAP[user_id]
-        await update.message.reply_text(f"UID confirmed: {uid}")
+        await update.message.reply_text(f"UID: {uid}. Starting")
 
 async def set_uid(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.message.from_user.id
+    telegram_uid = update.message.from_user.id
     if context.args:
-        uid = context.args[0]
-        if uid in HOST_UID_MAP.values():
-            USER_UID_MAP[user_id] = uid
-            save_data()
-            await update.message.reply_text(f"Your UID {uid} has been set.")
-        else:
-            await update.message.reply_text("Invalid UID. Please try again.")
+        rpi_uid = context.args[0]
+        if rpi_uid.isdigit() and int(rpi_uid) in HOST_UID_MAP['hosts'].values():
+            rpi_uid = int(rpi_uid)
+            for host in HOST_UID_MAP['hosts']:
+                if HOST_UID_MAP['hosts'][host] == rpi_uid:
+                    USER_UID_MAP[host] = telegram_uid
+                    save_data()
+                    await update.message.reply_text(f"Your rpi_uid {rpi_uid} has been set.")
+            return
+        await update.message.reply_text("Invalid rpi_uid. Please try again.")
     else:
-        await update.message.reply_text("Please provide a UID.")
+        await update.message.reply_text("Please provide a rpi_uid.")
 
 application.add_handler(CommandHandler('start', start))
 application.add_handler(CommandHandler('setuid', set_uid))
 
 # Server socket
-def handle_client(client_socket):
-    uid = str(len(HOST_UID_MAP) + 1)  # Example UID assignment
-    HOST_UID_MAP[uid] = 'pending'  # Mark UID as pending
-    client_socket.send(uid.encode('utf-8'))
+def handle_client(client_socket, address):
+    if address not in HOST_UID_MAP['hosts']:
+        uid = HOST_UID_MAP['free']
+        HOST_UID_MAP['hosts'][address] = uid # (ipv4, port number)
+        HOST_UID_MAP['free'] += 1
+    else:
+        uid = HOST_UID_MAP['hosts'][address]
+    client_socket.send(str(uid).encode('utf-8'))
     client_socket.close()
     save_data()
 
@@ -78,7 +94,7 @@ def server_thread():
         try:
             client_socket, addr = server.accept()
             print(f"Connection from {addr}")
-            handle_client(client_socket)
+            handle_client(client_socket, addr[0])
         except Exception as e:
             print(f"Error handling client: {e}")
 
