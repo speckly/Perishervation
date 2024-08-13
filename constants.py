@@ -1,4 +1,7 @@
-"""Author: Ritchie Yapp
+"""
+Author: Andrew Higgins
+https://github.com/speckly
+Project Perishervation
 
 This file contains all the constants used in Perishervation
 These constants may be modified due to changing needs.

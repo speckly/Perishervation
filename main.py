@@ -1,11 +1,19 @@
+"""
+Author: Andrew Higgins
+https://github.com/speckly
+Project Perishervation
+"""
+
 from time import sleep
 import sensors
 import thingspeak
+import telegram_client
 from constants import LIMITS, THINGSPEAK_API_DELAY
 
 def check_limits(fields: list) -> None:
     # [temperature, humidity, shock, light]
     keys = ["temperature", "humidity", "acceleration", "light"]
+    hit = False
     for key, magnitude in zip(keys, fields):
         field_limit = LIMITS.get(key)
         if field_limit is None:
@@ -18,6 +26,9 @@ def check_limits(fields: list) -> None:
                 print("Either beeps or duration is empty for %s, check it again" % key)
                 continue
             sensors.buzzer(beeps=beeps, duration=duration)
+            hit = True
+    return hit
+
         
 cycle = 0
 
@@ -25,11 +36,11 @@ while True:
     cycle += 1 
     print("Cycle number: ", cycle) # NOTE: Might want to remove this
     temperature, humidity = sensors.read_temphumid() # deg or fah?, %
-    acceleration = round(sensors.std_accel(sensors.read_accel()), 5) # 0 to 1
-    light = sensors.read_light() # 0 to 1023
+    acceleration: float = round(sensors.std_accel(sensors.read_accel()), 5) # 0 to 1
+    light: int = sensors.read_light() # 0 to 1023
     field_list = [temperature, humidity, acceleration, light]
     
-    #thingspeak.post(field_list) # uncomment when deploying
+    #thingspeak.post(field_list) # TODO: uncomment when deploying
     
     #TODO: remove this when deploying
     if temperature is not None:
@@ -41,6 +52,9 @@ while True:
     if light is not None:
         print("light: ", light)
 
-    check_limits(field_list)
+    hit_limit: bool = check_limits(field_list)
+    if hit_limit:
+        telegram_client.send_alert(field_limit)
+
     
     sleep(THINGSPEAK_API_DELAY)

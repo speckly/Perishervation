@@ -1,3 +1,11 @@
+"""
+Author: Andrew Higgins
+https://github.com/speckly
+Project Perishervation
+
+This will be deployed on a central server responsible for the Telegram networking in Perishervation
+"""
+
 import socket
 import threading
 from telegram import Bot
@@ -51,7 +59,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Please send the UID displayed on https://perishervation.com/get_uid")
     else:
         uid = USER_UID_MAP[user_id]
-        await update.message.reply_text(f"UID: {uid}. Starting")
+        await update.message.reply_text(f"UID: {uid}. Good to go")
 
 async def set_uid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     telegram_uid = update.message.from_user.id
@@ -74,15 +82,23 @@ application.add_handler(CommandHandler('setuid', set_uid))
 
 # Server socket
 def handle_client(client_socket, address):
-    if address not in HOST_UID_MAP['hosts']:
-        uid = HOST_UID_MAP['free']
-        HOST_UID_MAP['hosts'][address] = uid # (ipv4, port number)
-        HOST_UID_MAP['free'] += 1
-    else:
-        uid = HOST_UID_MAP['hosts'][address]
-    client_socket.send(str(uid).encode('utf-8'))
+    message = client_socket.recv(1024).decode('utf-8')
+    
+    if message == "uid":
+        if address not in HOST_UID_MAP['hosts']:
+            uid = HOST_UID_MAP['free']
+            HOST_UID_MAP['hosts'][address] = uid
+            HOST_UID_MAP['free'] += 1
+        else:
+            uid = HOST_UID_MAP['hosts'][address]
+            
+        save_data()
+        client_socket.sendall(uid.encode('utf-8'))
+    
+    else: # send alert data to client
+        pass
+
     client_socket.close()
-    save_data()
 
 def server_thread():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

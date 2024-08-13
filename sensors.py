@@ -1,3 +1,11 @@
+"""
+Author: Andrew Higgins
+https://github.com/speckly
+Project Perishervation
+
+Sensors utils
+"""
+
 import RPi.GPIO as GPIO
 import time
 import spidev

@@ -1,4 +1,10 @@
-# TODO: Decide on which formatting method to use or create a separate env for rpi
+"""
+Author: Andrew Higgins
+https://github.com/speckly
+Project Perishervation
+
+TODO: Decide on which formatting method to use or create a separate env for rpi
+"""
 
 from dotenv import load_dotenv
 from requests import get
