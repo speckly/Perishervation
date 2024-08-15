@@ -3,5 +3,6 @@ python-telegram-bot
 python-dotenv
 requests
 RPi.GPIO
+flask
 #git+https://github.com/adafruit/DHT-sensor-library.git
 

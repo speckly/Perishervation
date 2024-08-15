@@ -11,11 +11,13 @@ app = Flask(__name__)
 def index():
     # uid_class = UIDGenerator()
     # uid = uid_class.get_uid()
-    uid = 1
+    uid = get_uid()
     data = requests.get(f"https://api.thingspeak.com/channels/2597196/feeds.json?").json()
-   
 
     return render_template("index.html", value=uid, thingspeak_data = data)
 
+def main():
+    app.run(port=5050)
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    main()

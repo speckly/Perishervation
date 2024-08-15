@@ -20,8 +20,9 @@ python>=3.11
 installation of all libraries stated in `requirements.txt`
 
 # Setup
-
 It is recommended to use a virtual environment to avoid version conflict with other packages
+Contact us for the secrets
+Do also change the IP address of the Telegram server in constants.py
 
 ### Telegram bot
 [Perishervation Telegram bot](http://t.me/perishervation_bot)

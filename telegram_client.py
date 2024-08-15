@@ -4,6 +4,7 @@ https://github.com/speckly
 Project Perishervation
 
 Not to be deployed, only simulates
+send_alert and get_uid are deployed
 """
 
 import socket
@@ -31,7 +32,7 @@ def send_alert(data: list):
     # [temperature, humidity, shock, light]
     body = ""
     fields = ["temperature", "humidity", "shock", "light"]
-    body = ",".join("{}:{}".format(field, magnitude) for magnitude, field in zip(data, fields)) # cant use f string in rpi???????
+    body = ",".join("{}:{}".format(field, magnitude) for magnitude, field in zip(data, fields) if magnitude) # cant use f string in rpi???????
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
         client.connect((TELEGRAM_SERVER_IP, SERVER_PORT))
         client.sendall(body.encode('utf-8'))
