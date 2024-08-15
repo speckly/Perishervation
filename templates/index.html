@@ -1,0 +1,97 @@
+<!--Inherits layout from layout.html-->
+
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="row mt-5">
+    <div class="col-9">
+        <!-- <div class="row mt-5">
+
+        
+                <p class="justify-content-center" style="font-size: xx-large;">UID = 1</p>
+           
+           
+        </div> -->
+        <canvas id="myCanvas2"></canvas>
+       
+       
+    </div>
+    <div class="col-3 border border-dark rounded ">
+        <u class="d-flex justify-content-center">Average Temperature</u>
+        <div class="row">
+            <p class="col-8 d-flex justify-content-end" id="show_temp_value" style="font-size: xxx-large;">25</p>
+            <p class="col-4 d-flex align-items-end pb-3">°C</p>
+        </div>
+        <hr/>
+        <u class="d-flex justify-content-center">Average Humidity</u>
+        <div class="row">
+            <p class="col-8 d-flex justify-content-end" id="show_humid_value" style="font-size: xxx-large;">25</p>
+            <p class="col-4 d-flex align-items-end pb-3">%</p>
+        </div>
+        <hr/>
+        <u class="d-flex justify-content-center">Average Shock</u>
+        <div class="row">
+            <p class="col-8 d-flex justify-content-end" id="show_shock_value" style="font-size: xxx-large;">25</p>
+            <p class="col-4 d-flex align-items-end pb-3"></p>
+        </div>
+        <hr/>
+        <u class="d-flex justify-content-center">Average Light</u>
+        <div class="row">
+            <p class="col-8 d-flex justify-content-end" id="show_light_value" style="font-size: xxx-large;">25</p>
+            <p class="col-4 d-flex align-items-end pb-3"></p>
+        </div>
+       
+       
+        
+        
+        
+        
+        
+    </div>
+</div>
+<div class="row mt-5">
+    <div class="btn-group" role="group">
+        
+        <input type="radio" onclick="filter_actions('option1')" class="btn-check" name="btnradio" id="option2">
+        <label for="option2" class="btn btn-outline-dark">Temperature</label>
+
+        <input type="radio" onclick="filter_actions('option2')" class="btn-check" name="btnradio" id="option3">
+        <label for="option3" class="btn btn-outline-dark">Humidity</label>
+
+        <input type="radio" onclick="filter_actions('option3')" class="btn-check" name="btnradio" id="option4">
+        <label for="option4" class="btn btn-outline-dark">Shock</label>
+
+        <input type="radio" onclick="filter_actions('option4')" class="btn-check" name="btnradio" id="option5">
+        <label for="option5" class="btn btn-outline-dark">Light</label>
+    </div>
+</div>
+
+
+
+<script>
+    var data = '{{thingspeak_data|tojson}}';
+    console.log(data)
+    var data = JSON.parse(data)
+    console.log(data['channel'])
+    console.log(data['feeds'][6]['field1'])
+    console.log(data['feeds'][7]['field1'])
+   
+    var [avg_temp, avg_humid, avg_shock, avg_light, max, max_index, min, min_index] = create_data(data)
+    
+    console.log("TEMPERATUER AND HUMID")
+    console.log(avg_temp)
+    console.log(avg_humid)
+    console.log(avg_light)
+    console.log(avg_shock)
+
+
+    document.getElementById('show_temp_value').innerHTML = avg_temp
+    document.getElementById('show_humid_value').innerHTML = avg_humid
+    document.getElementById('show_shock_value').innerHTML = avg_shock
+    document.getElementById('show_light_value').innerHTML = avg_light
+
+
+</script>
+
+{% endblock %}
