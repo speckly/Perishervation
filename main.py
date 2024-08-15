@@ -4,11 +4,31 @@ https://github.com/speckly
 Project Perishervation
 """
 
+import threading
+import socket
 from time import sleep
 import sensors
 import thingspeak
 import telegram_client
 from constants import LIMITS, THINGSPEAK_API_DELAY
+
+CLIENT_PORT = 8081
+send_alert = False # determines if the RPI should send alerts to telegram server at runtime
+
+def listen_response():
+    global send_alert
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind(('0.0.0.0', CLIENT_PORT))
+    server.listen(5)
+
+    while True:
+        try:
+            client_socket, addr = server.accept()
+            message = client_socket.recv(1024).decode('utf-8')
+            send_alert: bool = (message == "200 OK")
+        except Exception as e:
+            print(f"Error handling client: {e}")
+
 
 def check_limits(fields: list) -> None:
     # [temperature, humidity, shock, light]
@@ -17,7 +37,7 @@ def check_limits(fields: list) -> None:
     for key, magnitude in zip(keys, fields):
         field_limit = LIMITS.get(key)
         if field_limit is None:
-            print("Your %s key is empty" % key)
+            # print("Your %s key is empty" % key)
             continue
         high_limit, low_limit = LIMITS[key].get("high"), LIMITS[key].get("low")
         if not all([magnitude < high_limit if high_limit else True, magnitude > low_limit if low_limit else True]):
@@ -29,32 +49,35 @@ def check_limits(fields: list) -> None:
             hit = True
     return hit
 
+if __name__ == "__main__":
+    global send_alert
+    threading.Thread(target=listen_response, daemon=True).start()
+
+    cycle = 0
+
+    while True:
+        cycle += 1 
+        print("Cycle number: ", cycle) # NOTE: Might want to remove this
+        temperature, humidity = sensors.read_temphumid() # deg or fah?, %
+        acceleration: float = round(sensors.std_accel(sensors.read_accel()), 5) # 0 to 1
+        light: int = sensors.read_light() # 0 to 1023
+        field_list = [temperature, humidity, acceleration, light]
         
-cycle = 0
+        #thingspeak.post(field_list) # TODO: uncomment when deploying
+        
+        #TODO: remove this when deploying
+        if temperature is not None:
+            print("tmp: ", temperature)
+        if humidity is not None:
+            print("hmd: ", humidity)
+        if acceleration is not None:
+            print("acc: ", acceleration)
+        if light is not None:
+            print("light: ", light)
 
-while True:
-    cycle += 1 
-    print("Cycle number: ", cycle) # NOTE: Might want to remove this
-    temperature, humidity = sensors.read_temphumid() # deg or fah?, %
-    acceleration: float = round(sensors.std_accel(sensors.read_accel()), 5) # 0 to 1
-    light: int = sensors.read_light() # 0 to 1023
-    field_list = [temperature, humidity, acceleration, light]
-    
-    #thingspeak.post(field_list) # TODO: uncomment when deploying
-    
-    #TODO: remove this when deploying
-    if temperature is not None:
-        print("tmp: ", temperature)
-    if humidity is not None:
-        print("hmd: ", humidity)
-    if acceleration is not None:
-        print("acc: ", acceleration)
-    if light is not None:
-        print("light: ", light)
+        hit_limit: bool = check_limits(field_list)
+        if send_alert and hit_limit:
+            telegram_client.send_alert(field_list)
 
-    hit_limit: bool = check_limits(field_list)
-    if hit_limit:
-        telegram_client.send_alert(field_limit)
-
-    
-    sleep(THINGSPEAK_API_DELAY)
+        
+        sleep(THINGSPEAK_API_DELAY)

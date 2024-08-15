@@ -14,22 +14,18 @@ import os
 
 load_dotenv()
 # Configuration
-PORT = 8080
+SERVER_PORT = 8080
+MY_PORT = 8081
 API_KEY = os.getenv("TELEGRAM_API")
 TELEGRAM_API_URL = f'https://api.telegram.org/bot{API_KEY}/'
 
 # Connect to the server and get UID
 def get_uid():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
-        client.connect((TELEGRAM_SERVER_IP, PORT))
+        client.connect((TELEGRAM_SERVER_IP, SERVER_PORT))
         client.sendall("uid".encode('utf-8'))
-        uid_message = client.recv(1024).decode('utf-8')
+        uid = client.recv(1024).decode('utf-8')
         return uid
-
-    # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
-    #     client.connect((TELEGRAM_SERVER_IP, PORT))
-    #     uid = client.recv(1024).decode('utf-8')
-    #     return uid
 
 def send_alert(data: list):
     # [temperature, humidity, shock, light]
@@ -37,7 +33,7 @@ def send_alert(data: list):
     fields = ["temperature", "humidity", "shock", "light"]
     body = ",".join("{}:{}".format(field, magnitude) for magnitude, field in zip(data, fields)) # cant use f string in rpi???????
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
-        client.connect((TELEGRAM_SERVER_IP, PORT))
+        client.connect((TELEGRAM_SERVER_IP, SERVER_PORT))
         client.sendall(body.encode('utf-8'))
         # response = client.recv(1024).decode('utf-8')
         # print(f"Server response: {response}")

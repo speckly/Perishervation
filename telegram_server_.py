@@ -8,6 +8,7 @@ This will be deployed on a central server responsible for the Telegram networkin
 
 import socket
 import threading
+import requests
 from telegram import Bot
 from telegram.ext import Application, CommandHandler, ContextTypes
 from telegram import Update
@@ -27,6 +28,7 @@ class UIDGenerator:
 load_dotenv()
 # Configuration
 PORT = 8080
+CLIENT_PORT = 8081
 API_KEY = os.getenv("TELEGRAM_API")
 HOST_UID_MAP = {'free': 1, 'hosts': {}}  # {uid: ip_address}
 USER_UID_MAP = {}  # {telegram_id: uid}
@@ -60,6 +62,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         uid = USER_UID_MAP[user_id]
         await update.message.reply_text(f"UID: {uid}. Good to go")
+        for addr in HOST_UID_MAP['hosts']:
+            if HOST_UID_MAP['hosts'][addr] == uid:
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
+                    client.connect((addr, CLIENT_PORT))
+                    client.sendall("200 OK".encode('utf-8'))
+                break
 
 async def set_uid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     telegram_uid = update.message.from_user.id
@@ -67,9 +75,9 @@ async def set_uid(update: Update, context: ContextTypes.DEFAULT_TYPE):
         rpi_uid = context.args[0]
         if rpi_uid.isdigit() and int(rpi_uid) in HOST_UID_MAP['hosts'].values():
             rpi_uid = int(rpi_uid)
-            for host in HOST_UID_MAP['hosts']:
-                if HOST_UID_MAP['hosts'][host] == rpi_uid:
-                    USER_UID_MAP[host] = telegram_uid
+            for addr in HOST_UID_MAP['hosts']:
+                if HOST_UID_MAP['hosts'][addr] == rpi_uid:
+                    USER_UID_MAP[addr] = telegram_uid
                     save_data()
                     await update.message.reply_text(f"Your rpi_uid {rpi_uid} has been set.")
             return
@@ -96,7 +104,15 @@ def handle_client(client_socket, address):
         client_socket.sendall(uid.encode('utf-8'))
     
     else: # send alert data to client
-        pass
+        message = ["High variable warning:"]
+        for pair in message.split(","):
+            field, magnitude = pair.split(":")
+            if magnitude and field in ["temperature", "humidity", "shock", "light"]:
+                # lookup client chat id
+                pass
+                # requests.get(f"https://api.telegram.org/bot{hardcode}/sendMessage?chat_id={h2}&text={message}")
+
+
 
     client_socket.close()
 
