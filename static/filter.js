@@ -87,7 +87,7 @@ function filter_actions(id) {
     var min = 300
     var max_index = 0
     var min_index = 0
-    for (var i=0; i<24; i++) {
+    for (var i=0; i<100; i++) {
         val = 0
         if (rm1) {val += temp_list[i]}
         if (rm2) {val += humid_list[i]}
