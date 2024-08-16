@@ -26,7 +26,7 @@ def listen_response():
     server.listen(5)
     while True:
         try:
-            client_socket, addr = server.accept()
+            client_socket, _ = server.accept()
             message = client_socket.recv(1024).decode('utf-8')
             alert_telegram = message == "OK"
         except Exception as e:
@@ -54,12 +54,9 @@ def check_limits(fields: list) -> list:
     return hits
 
 def main_loop():
-    cycle = 0
     empty_hits = [None] * 4
 
     while True:
-        cycle += 1 
-        print("Cycle number: ", cycle) # NOTE: Might want to remove this
         if SIMULATION:
             field_list = [random.randint(40,125), random.randint(20,90), round(random.random(), 5), random.randint(280,500)]
         else:
@@ -68,7 +65,7 @@ def main_loop():
             light: int = sensors.read_light() # 0 to 1023
             field_list = [temperature, humidity, acceleration, light]
         
-        #thingspeak.post(field_list) # TODO: uncomment when deploying
+        # thingspeak.post(field_list) # TODO: uncomment when deploying
         
         #TODO: remove this when deploying [temperature, humidity, shock, light]
         print(field_list, alert_telegram)
@@ -83,4 +80,3 @@ if __name__ == "__main__": # dont set daemon, nah dont
     threading.Thread(target=listen_response).start()
     threading.Thread(target=main_loop).start()
     app.main() # Blocking
-    # app.app.run(port=5050)
