@@ -7,8 +7,8 @@ This file contains all the constants used in Perishervation
 These constants may be modified due to changing needs.
 It is recommended that you understand the usage of the constant before making any changes"""
 
-SIMULATION = True # if no hardware is available
-GLOBAL_DELAY = 2 # Delay in seconds between dataset pushes to the Thingspeak channel
+SIMULATION = False # if no hardware is available
+GLOBAL_DELAY = 4 # Delay in seconds between dataset pushes to the Thingspeak channel
 TEMPHUMID_GPIO = 21 # DHT22 Temp and Humid
 LDR_SPI_CHANNEL = 0
 BUZZER_GPIO = 18
@@ -24,6 +24,6 @@ LIMITS = {
 	"light": {"low": 300, "beeps": 2, "duration": 0.2}
 }
 
-TELEGRAM_SERVER_IP = "localhost"
+TELEGRAM_SERVER_IP = "172.23.37.96"
 CLIENT_PORT = 8081
 	
