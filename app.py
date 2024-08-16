@@ -8,8 +8,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    # uid = get_uid()
-    uid=1
+    uid = get_uid()
     data = requests.get(f"https://api.thingspeak.com/channels/2597196/feeds.json?").json()
 
     return render_template("index.html", value=uid, thingspeak_data = data)

@@ -109,7 +109,7 @@ async def set_uid(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     USER_UID_MAP[addr] = telegram_uid
                     save_data()
                     await update.message.reply_text(f"Your rpi_uid {rpi_uid} has been set.")
-            return
+                    return
         await update.message.reply_text("Invalid rpi_uid. Please try again.")
     else:
         await update.message.reply_text("Please provide a rpi_uid.")
@@ -133,7 +133,8 @@ def handle_client(client_socket, address):
             field, magnitude = pair.split(":")
             if magnitude and field in ["temperature", "humidity", "shock", "light"]:
                 output.append(f"{field.capitalize()}: {magnitude}")
-        requests.get(f"https://api.telegram.org/bot{API_KEY}/sendMessage?chat_id={USER_UID_MAP[address]}&text={'\n'.join(output)}")
+        text = '\n'.join(output) # f-string expression part cannot include a backslash py <3.12
+        requests.get(f"https://api.telegram.org/bot{API_KEY}/sendMessage?chat_id={USER_UID_MAP[address]}&text={text}")
 
     client_socket.close()
 

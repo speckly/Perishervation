@@ -16,7 +16,8 @@ A Python IoT Project to ensure the quality preservation of perishable goods duri
 - Temperature and humidity: DHT22
 
 # Requirements
-python>=3.11 
+rpi with python<3.6
+telegram with python>=3.6 (tested on 3.11)
 installation of all libraries stated in `requirements.txt`
 
 # Setup
