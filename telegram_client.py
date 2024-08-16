@@ -8,7 +8,7 @@ send_alert and get_uid are deployed
 """
 
 import socket
-import requests
+# import requests
 from constants import TELEGRAM_SERVER_IP
 from dotenv import load_dotenv
 import os
@@ -23,12 +23,15 @@ TELEGRAM_API_URL = f'https://api.telegram.org/bot{API_KEY}/'
 # Connect to the server and get UID
 def get_uid():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
-        client.connect((TELEGRAM_SERVER_IP, SERVER_PORT))
+        try:
+            client.connect((TELEGRAM_SERVER_IP, SERVER_PORT))
+        except ConnectionRefusedError:
+            return "Telegram server down"
         client.sendall("uid".encode('utf-8'))
         uid = client.recv(1024).decode('utf-8')
         return uid
 
-def send_alert(data: list):
+def send_alert(data: list) -> None:
     # [temperature, humidity, shock, light]
     body = ""
     fields = ["temperature", "humidity", "shock", "light"]
